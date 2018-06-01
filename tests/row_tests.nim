@@ -32,7 +32,7 @@ suite "Row Tests":
         #Works!
         var s2 = inp[1].cstring
 
-        copyMem(addr s1, addr s2, sizeof(s1))
+        copyMem(addr s1, addr s2, s1.len * sizeof(char))
         echo $s1
         #Works!
 

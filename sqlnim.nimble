@@ -22,3 +22,7 @@ task run, "Run the app":
 task test, "Test the app":
     exec "mkdir -p tests/bin"
     exec "for i in tests/*.nim; do nim c -r $i; done"
+
+task debug, "Debug the app":
+    exec "mkdir -p bin"
+    exec "nim c --lineDir:on --debuginfo -r --out:bin/sqlnim src/sqlnim.nim"

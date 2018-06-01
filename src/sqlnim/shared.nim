@@ -25,14 +25,14 @@ type
         STATEMENT_SELECT = "SELECT"
 
 let 
-    ID_SIZE*: uint64 = sizeof(Row.id).uint64
-    USERNAME_SIZE*: uint64 = sizeof(Row.username).uint64
-    EMAIL_SIZE*: uint64 = sizeof(Row.email).uint64
+    ID_SIZE*: uint64 = sizeof(uint64).uint64
+    USERNAME_SIZE*: uint64 = 32
+    EMAIL_SIZE*: uint64 = 256
     ID_OFFSET*: uint64 = 0
     USERNAME_OFFSET*: uint64 = ID_OFFSET + ID_SIZE
     EMAIL_OFFSET*: uint64 = USERNAME_OFFSET + USERNAME_SIZE
-    ROW_SIZE*: uint64 = ID_SIZE + USERNAME_SIZE + EMAIL_SIZE
-    ROWS_PER_PAGE*:uint32  = PAGE_SIZE div sizeof(Row).uint32
+    ROW_SIZE* = ID_SIZE + USERNAME_SIZE + EMAIL_SIZE
+    ROWS_PER_PAGE*:uint32  = PAGE_SIZE div ROW_SIZE.uint32
     TABLE_MAX_ROWS*:uint32 = ROWS_PER_PAGE * TABLE_MAX_PAGES
 
 proc `$`(x: Row): string = 

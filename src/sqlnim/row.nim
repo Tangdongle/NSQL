@@ -1,11 +1,10 @@
 import shared
 
-proc serialize_row*(source: pointer, destination: var pointer, size: int) = 
-    copyMem(destination, source, ROW_SIZE)
+proc serialize_row*(destination, source: pointer, size: int) = 
+    copyMem(destination, source, size)
 
-proc deserialize_row*(source: pointer, destination: var pointer, size: int) = 
-    copyMem(destination, source, ROW_SIZE)
-    echo $destination
+proc deserialize_row*(destination, source: pointer, size: int) = 
+    copyMem(destination, source, size)
 
 proc init_row*(): Row =
     result.username = newString(USERNAME_SIZE)

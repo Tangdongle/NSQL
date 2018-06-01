@@ -56,10 +56,17 @@ proc main(parser: var OptParser) =
                 quit(QUITSUCCESS)
         of cmdEnd: assert(false)
 
+    var secondLine = false
     while true:
         printPrompt()
-        input_line = stdin.readLine()
-        #input_line = "insert 1 a a"
+        if not secondLine:
+        #input_line = stdin.readLine()
+            input_line = "insert 1 a a"
+            echo "Executing " & input_line
+            secondLine = true
+        else:
+            input_line = "select 1"
+            echo "Executing " & input_line
 
         if input_line.startsWith("."):
             case doMetaCommand(input_line)
@@ -86,6 +93,9 @@ proc main(parser: var OptParser) =
         of EXECUTE_TABLE_FULL:
             stderr.writeLine("Error: Table Full")
             stderr.flushFile
+
+        if "select" in input_line:
+            quit(QUITSUCCESS)
 
 proc writeHelp() =
     echo "Help"
@@ -119,7 +129,6 @@ proc prepareStatement(input: string, statement: var Statement): PrepareResult =
         statement.type = STATEMENT_INSERT
         statement.row_to_insert = new_row(id = id, username = args[2], email = args[3])
         #Compare to our row columns, plus one for the command
-        echo $statement.row_to_insert
         if args.len.uint > numRows + 1:
             return PREPARE_SYNTAX_ERROR
         return PREPARE_SUCCESS
@@ -131,11 +140,14 @@ proc prepareStatement(input: string, statement: var Statement): PrepareResult =
     return PREPARE_UNRECOGNIZED_STATEMENT
 
 proc execute_statement(statement: Statement, table: Table): ExecuteResult =
+    var sel: ExecuteResult
     case statement.type
     of STATEMENT_INSERT:
-        execute_insert(statement, table)
+        sel = execute_insert(statement, table)
     of STATEMENT_SELECT:
-        execute_select(statement, table)
+        sel = execute_select(statement, table)
+    echo "Leaving execute"
+    return sel
 
 when isMainModule:
     var parser = initOptParser()
