@@ -59,14 +59,7 @@ proc main(parser: var OptParser) =
     var secondLine = false
     while true:
         printPrompt()
-        if not secondLine:
-        #input_line = stdin.readLine()
-            input_line = "insert 1 a a"
-            echo "Executing " & input_line
-            secondLine = true
-        else:
-            input_line = "select 1"
-            echo "Executing " & input_line
+        input_line = stdin.readLine()
 
         if input_line.startsWith("."):
             case doMetaCommand(input_line)
@@ -94,9 +87,6 @@ proc main(parser: var OptParser) =
             stderr.writeLine("Error: Table Full")
             stderr.flushFile
 
-        if "select" in input_line:
-            quit(QUITSUCCESS)
-
 proc writeHelp() =
     echo "Help"
 
@@ -119,11 +109,11 @@ proc prepareStatement(input: string, statement: var Statement): PrepareResult =
     Prepare a statement to be executed as SQL
     ]##
     var 
-        id: uint64
+        id: int
         username, email: cstring
         args = input.split(' ')
 
-    id = parseUInt(args[1]).uint64
+    id = parseInt(args[1])
 
     if args[0].cmpIgnoreCase("insert") == 0:
         statement.type = STATEMENT_INSERT

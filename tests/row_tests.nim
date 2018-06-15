@@ -36,6 +36,25 @@ suite "Row Tests":
         echo $s1
         #Works!
 
+    test "Copy strings to row attributes":
+        var 
+            dest_test_username_string = newString(USERNAME_SIZE)
+            src_test_username_string = "TEST"
+
+        copyMem(r2.username.addr, src_test_username_string.addr, sizeof(src_test_username_string))
+
+        echo "string -> row"
+        check(r2.username == src_test_username_string)
+        check(equalMem(r2.username.addr, src_test_username_string.addr, sizeof(src_test_username_string)))
+        echo r2.username & " | " & src_test_username_string
+
+        echo "row -> string"
+        copyMem(dest_test_username_string.addr, r.username.addr, sizeof(r.username))
+
+        check(r.username == dest_test_username_string)
+        check(equalMem(r.username.addr, dest_test_username_string.addr, sizeof(r.username)))
+        echo r.username & " | " & dest_test_username_string
+        
 
 
 

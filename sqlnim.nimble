@@ -21,8 +21,20 @@ task run, "Run the app":
 
 task test, "Test the app":
     exec "mkdir -p tests/bin"
-    exec "for i in tests/*.nim; do nim c -r $i; done"
+    exec "for i in tests/*.nim; do nim c -r --out:tests/bin/$i $i; done"
+
+task test_row, "Test the row model":
+    exec "mkdir -p tests/bin"
+    exec "nim c -r --out:tests/bin/row_tests tests/row_tests.nim"
+
+task test_table, "Test the table model":
+    exec "mkdir -p tests/bin"
+    exec "nim c -r --out:tests/bin/table_tests tests/table_tests.nim"
 
 task debug, "Debug the app":
     exec "mkdir -p bin"
     exec "nim c --lineDir:on --debuginfo -r --out:bin/sqlnim src/sqlnim.nim"
+
+task tables, "Run table tests":
+    exec "mkdir -p bin/tests"
+    exec "nim c -r --out:bin/tests/tabletest src/sqlnim/table.nim"
