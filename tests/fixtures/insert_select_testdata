@@ -1,0 +1,15 @@
+insert 1 Test1 Test1@test1.com
+insert 2 Test2 Test1@test2.com
+insert 3 Test3 Test1@test3.com
+insert 4 Test4 Test1@test4.com
+insert 5 Test5 Test1@test5.com
+insert 6 Test6 Test1@test6.com
+insert 7 Test7 Test1@test7.com
+select 1 
+select 2 
+select 3 
+select 4 
+select 5 
+select 6 
+select 7 
+
