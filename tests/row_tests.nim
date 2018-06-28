@@ -54,7 +54,3 @@ suite "Row Tests":
         check(r.username == dest_test_username_string)
         check(equalMem(r.username.addr, dest_test_username_string.addr, sizeof(r.username)))
         echo r.username & " | " & dest_test_username_string
-        
-
-
-

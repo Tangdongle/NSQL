@@ -71,7 +71,7 @@ proc main(parser: var OptParser) =
         
         case prepareStatement(input_line, statement)
         of PREPARE_SUCCESS:
-            stderr.writeLine "Command success"
+            stderr.writeLine "\nCommand success"
         of PREPARE_UNRECOGNIZED_STATEMENT:
             stderr.writeLine &"Unrecognized keyword at start of '{input_line}'" 
             continue
@@ -81,11 +81,9 @@ proc main(parser: var OptParser) =
 
         case execute_statement(statement, table)
         of EXECUTE_SUCCESS:
-            stdout.writeLine("Executed successfully")
-            stdout.flushFile
+            stdout.writeLine("\nExecuted successfully")
         of EXECUTE_TABLE_FULL:
-            stderr.writeLine("Error: Table Full")
-            stderr.flushFile
+            stderr.writeLine("\nError: Table Full")
 
 proc writeHelp() =
     echo "Help"
@@ -136,9 +134,61 @@ proc execute_statement(statement: Statement, table: Table): ExecuteResult =
         sel = execute_insert(statement, table)
     of STATEMENT_SELECT:
         sel = execute_select(statement, table)
-    echo "Leaving execute"
     return sel
 
-when isMainModule:
+proc init() =
     var parser = initOptParser()
     main(parser)
+
+when isMainModule:
+    import unittest, os, ospaths, streams, memfiles
+
+    suite "Application Tests":
+
+        setup:
+            echo "Starting Test"
+            let 
+                test_dir = getCurrentDir() / "tests/fixtures/"
+            var
+                test_stdout: MemFile
+
+            
+        test "Application can insert a row":
+            var 
+                test_filename = test_dir / "insert_testdata"
+                test_file: File
+
+
+            test_file = system.open(test_filename, fmRead)
+            var test_file_size = int(getFileSize(test_filename))
+
+            test_stdout = memfiles.open(filename = "/home/ryan/dev/nim/sqlnim/tests/fixtures/out_testdata",
+            mode = fmReadWrite, mappedSize = test_file_size)
+            assert(not isNil(test_stdout.mem))
+            test_file.setFilePos(0)
+
+            discard stdin.reopen(test_filename)
+
+            checkpoint("Passing in STDIN")
+            
+            expect IOError:
+                init()
+
+            checkpoint("Reading results")
+            var success_counts = 0
+            for line in test_stdout.lines:
+                echo line
+                if "Executed successfully" in line:
+                    success_counts.inc
+
+            var total_in_lines = 0
+            for line in lines(test_file):
+                total_in_lines.inc
+
+            check success_counts == total_in_lines
+
+        test "Application can select a row":
+            echo "Test 2"
+
+        test "Application can insert, then select a row":
+            echo "Test 3"

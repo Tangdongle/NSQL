@@ -23,7 +23,6 @@ proc row_slot(table: Table, row_num: int): pointer =
         row_offset: uint64 = uint64(row_num mod ROWS_PER_PAGE)
         byte_offset: uint64 = uint64(row_offset * ROW_SIZE.uint64)
     var page: pointer = table.pages[page_num]
-    echo "Page Num: " & $page_num & " FROM " & $row_num & " div " & $ROWS_PER_PAGE
 
     if isNil(page):
         table.pages[page_num] = alloc0(PAGE_SIZE)
@@ -42,7 +41,6 @@ proc execute_insert*(statement: Statement, table: Table): ExecuteResult =
 
 
 proc execute_select*(statement: Statement, table: Table): ExecuteResult =
-    echo "In select"
     var 
         row:Row = init_row()
         rowSlot:pointer
@@ -50,9 +48,7 @@ proc execute_select*(statement: Statement, table: Table): ExecuteResult =
     for i in 0 ..< table.num_rows:
         rowSlot = row_slot(table, i)
         deserialize_row(row.addr, rowSlot)
-        echo $row
 
-    echo "Leaving select"
     EXECUTE_SUCCESS
 
 when isMainModule:
