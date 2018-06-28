@@ -48,7 +48,6 @@ task trace_mmap, "Trace mmap":
     exec "nim c --out:bin/tests/mmaptest tests/mmaptest.nim"
     exec "strace -o strace.log bin/tests/mmaptest"
 
-
 task trace_main, "Trace Main":
     exec "mkdir -p bin"
     exec "nim c --out:bin/sqlnim src/sqlnim.nim"

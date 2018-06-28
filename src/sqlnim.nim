@@ -142,6 +142,7 @@ proc init() =
 
 when isMainModule:
     import unittest, os, ospaths, streams, memfiles
+    from posix import dup, dup2
 
     suite "Application Tests":
 
@@ -149,40 +150,51 @@ when isMainModule:
             echo "Starting Test"
             let 
                 test_dir = getCurrentDir() / "tests/fixtures/"
+                saved_stdout = dup(1)
+                saved_stdin = dup(0)
             var
                 test_stdout: MemFile
 
+        teardown:
+            close(stdin)
+            discard dup2(saved_stdin, 0) 
             
         test "Application can insert a row":
             var 
-                test_filename = test_dir / "insert_testdata"
-                test_file: File
+                in_test_filename = test_dir / "insert_testdata"
+                out_test_filename = test_dir / "out_testdata"
+                redir_stdin, redir_stdout: File
+                
 
 
-            test_file = system.open(test_filename, fmRead)
-            var test_file_size = int(getFileSize(test_filename))
-
-            test_stdout = memfiles.open(filename = "/home/ryan/dev/nim/sqlnim/tests/fixtures/out_testdata",
-            mode = fmReadWrite, mappedSize = test_file_size)
-            assert(not isNil(test_stdout.mem))
-            test_file.setFilePos(0)
-
-            discard stdin.reopen(test_filename)
+            redir_stdin = system.open(in_test_filename, fmRead)
+            redir_stdout = system.open(out_test_filename, fmWrite)
+            #Duplicate our stdin
+            stderr.writeLine($getFileInfo(stdout).id.file)
+            discard dup2(getFileHandle(redir_stdin), 0)
+            discard dup2(getFileHandle(redir_stdout), 1)
+            stderr.writeLine($getFileInfo(stdout).id.file)
 
             checkpoint("Passing in STDIN")
             
-            expect IOError:
-                init()
+            init()
 
+            close(stdout)
+            close(redir_stdout)
+            discard dup2(saved_stdout, 1)
+            stderr.writeLine($getFileInfo(stdout).id.file)
             checkpoint("Reading results")
             var success_counts = 0
-            for line in test_stdout.lines:
-                echo line
+            for line in redir_stdout.lines:
+                stderr.writeLine(line)
                 if "Executed successfully" in line:
                     success_counts.inc
 
+
+
+            redir_stdin.setFilePos(0)
             var total_in_lines = 0
-            for line in lines(test_file):
+            for line in redir_stdin.lines:
                 total_in_lines.inc
 
             check success_counts == total_in_lines
